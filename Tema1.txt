@@ -1,0 +1,56 @@
+SYS_EXIT equ 1
+SYS_READ equ 3
+SYS_WRITE equ 4
+STDIN equ 0
+STDOUT equ 1
+
+segment .data
+    msg1 db "n=",0xA, 0xD
+    len1 equ $-msg1
+    msg2 db "este in multime",0xA, 0xD
+    len2 equ $-msg2
+    msg3 db "nu este in multime",0xA, 0xD
+    len3 equ $-msg3
+
+segment .bss
+    n resb 1  ;initializez num1 cu 1 byte
+
+section .text
+    global main
+main:
+    ;Afisare msg1
+    mov eax, SYS_WRITE  
+    mov ebx, STDOUT
+    mov ecx, msg1
+    mov edx, len1
+    int 0x80
+    ;Citire de la tastatura cifra
+    mov eax, SYS_READ
+    mov ebx, STDIN
+    mov ecx, n
+    mov edx, 1
+    int 0x80
+    
+    mov ecx, [n] 
+    cmp ecx, '0'   ;compar ecx cu '0'
+    je apartine
+    cmp ecx, '2'  ; compar ecx cu '2'
+    je apartine
+    
+    ;in caz ca numarul citit nu este din multimea {0,2} se va afisa msg3
+    mov eax, SYS_WRITE
+    mov ebx,STDOUT
+    mov ecx,msg3
+    mov edx,len3
+    int 0x80
+    jmp outprog
+    ;afisare msg2 in caz ca numarul citit apartine multimii
+apartine:  
+    mov eax, SYS_WRITE
+    mov ebx,STDOUT
+    mov ecx,msg2
+    mov edx,len2
+    int 0x80
+outprog:
+    mov eax, SYS_EXIT
+    int 0x80
